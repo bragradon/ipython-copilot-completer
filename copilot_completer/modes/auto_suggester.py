@@ -11,6 +11,8 @@ from prompt_toolkit.auto_suggest import (
 )
 from prompt_toolkit.patch_stdout import patch_stdout
 
+from ..settings import settings
+
 
 if TYPE_CHECKING:
     from prompt_toolkit.buffer import Buffer
@@ -25,7 +27,7 @@ class CopilotSuggester(AutoSuggestFromHistory):
     ) -> Optional[Suggestion]:
 
         text = document.text.rsplit("\n", 1)[-1]
-        if text.strip():
+        if text.strip() and settings.token:
             # Get a suggestion from Copilot
             suggestion = self.get_copilot_suggestion(text)
             if suggestion:

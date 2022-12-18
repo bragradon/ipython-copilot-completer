@@ -19,8 +19,15 @@ Once installed, you can activate the plugin by running the following command in 
 ## Configuration
 
 You will need to provide a GitHub Copilot API Token to use IPython Copilot Completer.
-To do so, you should use a MITM Proxy to capture the token from VS Code or PyCharm and then
-set the `GITHUB_COPILOT_ACCESS_TOKEN` environment variable to the captured token.
+You can obtain a token by running the following magic command in an IPython session:
+
+```python
+%copilot_login
+```
+
+This will open a browser window where you can log in to GitHub and generate a token.
+
+Alternatively, if you already have a token, you can set it via the `GITHUB_COPILOT_ACCESS_TOKEN` environment variable.
 
 ## Operation modes
 

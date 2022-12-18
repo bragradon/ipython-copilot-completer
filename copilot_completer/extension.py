@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from IPython import get_ipython
+from IPython.core.magic import Magics, magics_class, register_line_magic
+
 from .completer import copilot_completer
+from .github_auth import get_github_access_token
 from .modes import (
     add_key_binding,
     add_to_tab_completions,
@@ -25,9 +29,9 @@ def load_ipython_extension(ipython: InteractiveShell):
     """
     if not settings.token:
         print(
-            "GITHUB_ACCESS_TOKEN environment variable is not set - Copilot will not work",
+            "GITHUB_COPILOT_ACCESS_TOKEN environment variable is not set - Copilot will not work",
         )
-        return
+        print("Please run %copilot_login to set your token")
 
     # If the copilot completer is in the disabled matchers then we have already loaded
     # the extension so we don't need to do anything except re-enable the completer
@@ -46,6 +50,9 @@ def load_ipython_extension(ipython: InteractiveShell):
         completer.disable_matchers.append("copilot_completer")
         add_key_binding()
 
+    # Register the magic command
+    ipython.register_magics(CopilotMagics)
+
 
 def unload_ipython_extension(ipython: InteractiveShell):
     ipython.Completer.disable_matchers.append("copilot_completer")
@@ -56,3 +63,24 @@ def unload_ipython_extension(ipython: InteractiveShell):
         disable_copilot_suggester(ipython)
     elif settings.key_binding:
         remove_key_binding()
+
+
+if get_ipython():
+    # We need this so setuptools can create the wheel
+    # because the magic decorator will fail due to ipython not being loaded
+    @magics_class
+    class CopilotMagics(Magics):
+        @register_line_magic
+        def copilot_login(self, line=None):
+            """
+            Get a GitHub access token for Copilot
+            """
+            if token := get_github_access_token():
+                print(f"Your GitHub access token is: {token.access_token}")
+
+                ip = get_ipython()
+                db = ip.db
+                db["github_copilot_access_token"] = token.access_token
+                settings.reset()
+            else:
+                print("Failed to get access token")

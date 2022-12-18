@@ -6,13 +6,17 @@ from contextlib import suppress
 from typing import TYPE_CHECKING
 
 import requests
-from IPython.core.completer import _convert_matcher_v1_result_to_v2, context_matcher
+from IPython.core.completer import (
+    SimpleMatcherResult,
+    _convert_matcher_v1_result_to_v2,
+    context_matcher,
+)
 
 from .settings import settings
 
 
 if TYPE_CHECKING:
-    from IPython.core.completer import Completer, CompletionContext, SimpleMatcherResult
+    from IPython.core.completer import Completer, CompletionContext
 
 
 @context_matcher()
@@ -25,6 +29,9 @@ def copilot_completer(
     This uses the current session as the context for the completion
     but ignores lines that start with % or ! as these are not valid Python
     """
+
+    if not settings.token:
+        return SimpleMatcherResult(completions=[])
 
     # Get the current session as a list of lines joined by newlines
     hm = self.shell.history_manager
