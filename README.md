@@ -7,7 +7,7 @@ IPython Copilot Completer is a plugin for the IPython interactive shell that pro
 To install IPython Copilot Completer, download the release wheel and run:
 
 ```bash
-pip install IPython_Copilot_Completer-0.0.1-py3-none-any.whl
+pip install IPython_Copilot_Completer-<version>-py3-none-any.whl
 ```
 
 Once installed, you can activate the plugin by running the following command in an IPython session:
@@ -16,26 +16,32 @@ Once installed, you can activate the plugin by running the following command in 
 %load_ext copilot_completer
 ```
 
-
-## Usage
-
-To use IPython Copilot Completer, simply start typing a command in the IPython shell and hit ctrl-space to trigger a completion.
-The completions provided will replace the current line and can be accepted by pressing enter.
-
-
 ## Configuration
 
-You will need to provide a GitHub Copilot API Token to use IPython Copilot Completer. 
-To do so, you should use a MITM Proxy to capture the token from VS Code or PyCharm and then set the `GITHUB_COPILOT_ACCESS_TOKEN` environment variable to the captured token.
+You will need to provide a GitHub Copilot API Token to use IPython Copilot Completer.
+To do so, you should use a MITM Proxy to capture the token from VS Code or PyCharm and then
+set the `GITHUB_COPILOT_ACCESS_TOKEN` environment variable to the captured token.
+
+## Operation modes
+
+IPython Copilot Completer can operate in 3 modes: 'autosuggestion, 'keybinding', and 'inline'.
+The default is 'autosuggestion'.
 
 ### Auto suggestions
 
-You can also configure IPython Copilot Completer to instead provide Copilot completions as auto suggestions.
+You can configure IPython Copilot Completer to provide Copilot completions as inline auto-suggestions.
 To do so, set the `GITHUB_COPILOT_AUTO_SUGGEST` environment variable to `1`.
+
+### Keyboard shortcut
+
+You can configure IPython Copilot Completer to provide Copilot completions only after hitting `ctrl-space` to trigger the completion.
+The completions provided will replace the current line and can be accepted by pressing enter.
+To do so, set the `GITHUB_COPILOT_KEY_BINDING` environment variable to `1`.
 
 ### Inlining Copilot completions
 
-You can also configure IPython Copilot Completer to instead inline Copilot completions into the tab completion menu.
+You can configure IPython Copilot Completer to have the Copilot completions inline with other completions.
+They will appear inside the tab completion menu.
 To do so, set the `GITHUB_COPILOT_INLINE_COMPLETIONS` environment variable to `1`.
 
 Note: This will slow down tab completion as it will require an additional API call to GitHub Copilot for each completion.
@@ -45,6 +51,3 @@ It also returns only a single completion, so it is not as useful as the default 
 ## License
 
 IPython Copilot Completer is released under the [MIT License](LICENSE).
-
-
-
