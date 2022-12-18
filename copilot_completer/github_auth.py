@@ -11,9 +11,16 @@ import requests
 from requests import HTTPError, Response
 
 
-OAUTH_CLIENT_ID = "01ab8ac9400c4e429b23"  # GitHub's VSCode auth client ID
+# In order to get the access token we need to use the device flow
+# Because we want to use GitHub Copilot in an unsuppored environment
+# we get the access token by impersonating a VSCode's GitHub authentication
+OAUTH_CLIENT_ID = "01ab8ac9400c4e429b23"
+
+# Required Scope and Grant Type for the device flow
 OAUTH_SCOPE = "read:user"
 OAUTH_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code"
+
+# Headers to use for all requests
 REQUEST_HEADERS = {
     "content-type": "application/json",
     "accept": "application/json",
@@ -50,7 +57,7 @@ def get_github_access_token() -> Optional[AccessToken]:
     if access_token := wait_for_access_token(login_session):
         return access_token
     else:
-        print("Failed to log in")
+        print("Failed to log in to github with device flow")
 
 
 def get_login_session() -> LoginSession:
@@ -66,7 +73,7 @@ def get_login_session() -> LoginSession:
         response.raise_for_status()
         return LoginSession(**response.json())
     except HTTPError:
-        log_failure_response(response)
+        print_failure(response)
         raise
 
 
@@ -97,7 +104,7 @@ def wait_for_access_token(session: LoginSession) -> Optional[AccessToken]:
             else:
                 access_token = AccessToken(**response.json())
         except HTTPError:
-            log_failure_response(response)
+            print_failure(response)
             raise
         else:
             has_expired = datetime.now(tz=timezone.utc) >= expiry
@@ -105,7 +112,7 @@ def wait_for_access_token(session: LoginSession) -> Optional[AccessToken]:
     return access_token
 
 
-def log_failure_response(response: Response) -> None:
+def print_failure(response: Response) -> None:
     print("Unhandled error occurred")
-    print(f"Response status code: {response.status_code}")
-    print(f"Response content:\n\n{response.content}\n")
+    print(f"Status code: {response.status_code}")
+    print(f"Body:\n\n{response.content}\n")
