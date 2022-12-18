@@ -28,6 +28,11 @@ The completions provided will replace the current line and can be accepted by pr
 You will need to provide a GitHub Copilot API Token to use IPython Copilot Completer. 
 To do so, you should use a MITM Proxy to capture the token from VS Code or PyCharm and then set the `GITHUB_COPILOT_ACCESS_TOKEN` environment variable to the captured token.
 
+### Auto suggestions
+
+You can also configure IPython Copilot Completer to instead provide Copilot completions as auto suggestions.
+To do so, set the `GITHUB_COPILOT_AUTO_SUGGEST` environment variable to `1`.
+
 ### Inlining Copilot completions
 
 You can also configure IPython Copilot Completer to instead inline Copilot completions into the tab completion menu.

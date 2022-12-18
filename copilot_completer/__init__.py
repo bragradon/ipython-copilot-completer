@@ -1,5 +1,5 @@
-__version__ = '0.0.1'
+__version__ = "0.0.2"
 
-from .copilot_completer import load_ipython_extension, unload_ipython_extension
+from .extension import load_ipython_extension, unload_ipython_extension
 
-__all__ = ['load_ipython_extension', 'unload_ipython_extension']
+__all__ = ["load_ipython_extension", "unload_ipython_extension"]
