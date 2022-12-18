@@ -1,0 +1,87 @@
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.git          # root of the project
+    | \.idea
+  )/
+)
+'''
+
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+lines_after_imports = 2
+known_third_party = ['ipython', 'requests']
+add_imports = ["from __future__ import annotations"]
+
+
+[tool.flake8]
+max-line-length = 88
+ignore = ['E501', 'TYP001', 'W503']
+max-complexity = 10
+count = true
+
+
+[tool.pycln]
+all = true
+
+[tool.pyright]
+pythonVersion = "3.9"
+pythonPlatform = "All"
+typeCheckingMode = "basic"  #basic, strict
+reportMissingImports = true
+reportUnnecessaryTypeIgnoreComment = true
+reportConstantRedefinition = "none"
+reportDuplicateImport = "none"
+reportFunctionMemberAccess = "none"
+reportImportCycles = "none"
+reportIncompatibleMethodOverride = "none"
+reportIncompatibleVariableOverride = "none"
+reportIncompleteStub = "none"
+reportInconsistentConstructor = "none"
+reportInvalidStubStatement = "none"
+reportMatchNotExhaustive = "none"
+reportMissingParameterType = "none"
+reportMissingTypeArgument = "none"
+reportOverlappingOverload = "none"
+reportPrivateUsage = "none"
+reportTypeCommentUsage = "none"
+reportUnknownArgumentType = "none"
+reportUnknownLambdaType = "none"
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUnknownVariableType = "none"
+reportUnnecessaryCast = "none"
+reportUnnecessaryComparison = "none"
+reportUnnecessaryContains = "none"
+reportUnnecessaryIsInstance = "none"
+reportUnusedClass = "none"
+reportUnusedImport = "none"
+reportUnusedFunction = "none"
+reportUnusedVariable = "none"
+reportUntypedBaseClass = "none"
+reportUntypedClassDecorator = "none"
+reportUntypedFunctionDecorator = "none"
+reportUntypedNamedTuple = "none"
+reportCallInDefaultInitializer = "none"
+reportImplicitStringConcatenation = "none"
+reportMissingSuperCall = "none"
+reportPropertyTypeMismatch = "none"
+reportUninitializedInstanceVariable = "none"
+reportUnusedCallResult = "none"
+
+include = [
+    "*.py",
+]
+exclude = [
+    "**/__pycache__",
+]
+ignore = [
+    "**/__pycache__",
+]
+strict = []

@@ -1,30 +1,24 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
 import requests
-from IPython.core.completer import (
-    _convert_matcher_v1_result_to_v2,
-    context_matcher,
-)
+from IPython.core.completer import _convert_matcher_v1_result_to_v2, context_matcher
+
+from .settings import settings
+
 
 if TYPE_CHECKING:
-    from IPython.core.completer import (
-        Completer,
-        CompletionContext,
-        SimpleMatcherResult,
-    )
-
-GITHUB_COPILOT_ACCESS_TOKEN = os.environ.get("GITHUB_COPILOT_ACCESS_TOKEN", None)
+    from IPython.core.completer import Completer, CompletionContext, SimpleMatcherResult
 
 
 @context_matcher()
 def copilot_completer(
-    self: Completer, context: CompletionContext
+    self: Completer,
+    context: CompletionContext,
 ) -> SimpleMatcherResult:
     """
     Use GitHub Copilot to complete code the current line
@@ -39,7 +33,7 @@ def copilot_completer(
             i[-1]
             for i in hm.get_range(hm.session_number)
             if not i[-1].startswith(("%", "!"))
-        ]
+        ],
     )
 
     # Get the current line
@@ -168,7 +162,7 @@ def get_copilot_token() -> tuple[str, str]:
         headers={
             "content-type": "application/json",
             "accept": "application/json",
-            "Authorization": f"token {GITHUB_COPILOT_ACCESS_TOKEN}",
+            "Authorization": f"token {settings.token}",
         },
     )
 

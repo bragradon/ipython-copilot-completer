@@ -1,0 +1,85 @@
+default_stages: [commit, push]
+default_language_version:
+    python: python3.9
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-ast
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-case-conflict
+      - id: check-toml
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [ --fix=lf ]
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.3.1
+    hooks:
+      - id: forbid-tabs
+      - id: remove-tabs
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+      - id: pyupgrade
+        args: [ --py39-plus, --keep-runtime-typing ]
+
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.1.2
+    hooks:
+      - id: pycln
+        args: [ --config=pyproject.toml ]
+
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.4.0
+    hooks:
+      - id: add-trailing-comma
+        args: [ --py36-plus ]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.11.3
+    hooks:
+      - id: isort
+        name: isort (python)
+        args: [ --settings-path=pyproject.toml ]
+
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+      - id: black
+        args: [ --config=pyproject.toml ]
+
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args: [ --max-complexity=10 ]
+        additional_dependencies: [
+          Flake8-pyproject,
+          flake8-bugbear,
+          flake8-typing-imports,
+          flake8-simplify,
+          flake8-comprehensions,
+          flake8-implicit-str-concat,
+          flake8-newspaper-style,
+          flake8-datetimez,
+          pep8-naming,
+          mccabe,
+          flake8-noqa,
+        ]
+
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.284
+    hooks:
+    - id: pyright
+      additional_dependencies: [
+        ipython,
+        requests,
+      ]
