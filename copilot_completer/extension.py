@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 from IPython import get_ipython
+from IPython.core.completer import ProvisionalCompleterWarning
 from IPython.core.magic import Magics, magics_class, register_line_magic
 
 from .completer import copilot_completer
@@ -63,6 +65,10 @@ def unload_ipython_extension(ipython: InteractiveShell):
         disable_copilot_suggester(ipython)
     elif settings.key_binding:
         remove_key_binding()
+
+
+# Remove the IPython completer warning
+warnings.filterwarnings("ignore", category=ProvisionalCompleterWarning)
 
 
 if get_ipython():
