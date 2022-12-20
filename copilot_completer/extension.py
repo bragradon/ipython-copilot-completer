@@ -39,21 +39,6 @@ def load_ipython_extension(ipython: InteractiveShell):
         add_key_binding()
 
     # Register the magic command
-    ipython.register_magics(CopilotMagics)
-
-
-def unload_ipython_extension(ipython: InteractiveShell):
-    if settings.inline:
-        remove_from_tab_completions(ipython)
-    elif settings.auto_suggestion:
-        disable_copilot_suggester(ipython)
-    elif settings.key_binding:
-        remove_key_binding()
-
-
-if get_ipython():
-    # We need this so setuptools can create the wheel
-    # because the magic decorator will fail due to ipython not being loaded
     @magics_class
     class CopilotMagics(Magics):
         @register_line_magic
@@ -70,3 +55,17 @@ if get_ipython():
                 settings.reset()
             else:
                 print("Failed to get access token")
+
+    ipython.register_magics(CopilotMagics)
+
+
+def unload_ipython_extension(ipython: InteractiveShell):
+    if settings.inline:
+        remove_from_tab_completions(ipython)
+    elif settings.auto_suggestion:
+        disable_copilot_suggester(ipython)
+    elif settings.key_binding:
+        remove_key_binding()
+
+    # Unregister the magic command
+    del ipython.magics_manager.magics["line"]["copilot_login"]
