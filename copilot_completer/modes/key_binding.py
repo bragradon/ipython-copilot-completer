@@ -9,10 +9,9 @@ from prompt_toolkit.filters import (
     emacs_insert_mode,
     vi_insert_mode,
 )
-from prompt_toolkit.key_binding.bindings.completion import (
-    display_completions_like_readline,
-)
 from prompt_toolkit.keys import Keys
+
+from copilot_completer.completer import get_copilot_suggestion
 
 
 def add_key_binding():
@@ -43,18 +42,9 @@ def get_copilot_completions(event):
     Get completions from GitHub Copilot for key binding
     This temporarily replaces the IPython completers with the Copilot completer
     """
-    ip = get_ipython()
-    completer = ip.Completer
 
-    use_jedi = completer.use_jedi
-    suppress_competing_matchers = completer.suppress_competing_matchers
-    completer.use_jedi = False
-    completer.suppress_competing_matchers = True
-    completer.disable_matchers.remove("copilot_completer")
+    buffer = event.current_buffer
 
-    try:
-        display_completions_like_readline(event)
-    finally:
-        completer.use_jedi = use_jedi
-        completer.suppress_competing_matchers = suppress_competing_matchers
-        completer.disable_matchers.append("copilot_completer")
+    if suggestion := get_copilot_suggestion(buffer.document.text):
+        # buffer.delete_before_cursor(-completions[0].start_position)
+        buffer.insert_text(suggestion)

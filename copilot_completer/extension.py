@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import warnings
 from typing import TYPE_CHECKING
 
 from IPython import get_ipython
-from IPython.core.completer import ProvisionalCompleterWarning
 from IPython.core.magic import Magics, magics_class, register_line_magic
 
-from .completer import copilot_completer
 from .github_auth import get_github_access_token
 from .modes import (
     add_key_binding,
@@ -35,21 +32,11 @@ def load_ipython_extension(ipython: InteractiveShell):
         )
         print("Please run %copilot_login to set your token")
 
-    # If the copilot completer is in the disabled matchers then we have already loaded
-    # the extension so we don't need to do anything except re-enable the completer
-    if "copilot_completer" in (completer := ipython.Completer).disable_matchers:
-        completer.disable_matchers.remove("copilot_completer")
-        return
-
-    ipython.set_custom_completer(copilot_completer)
-
     if settings.inline:
         add_to_tab_completions(ipython)
     elif settings.auto_suggestion:
         enable_copilot_suggester(ipython)
     elif settings.key_binding:
-        # Add a key binding to get Copilot completions
-        completer.disable_matchers.append("copilot_completer")
         add_key_binding()
 
     # Register the magic command
@@ -57,18 +44,12 @@ def load_ipython_extension(ipython: InteractiveShell):
 
 
 def unload_ipython_extension(ipython: InteractiveShell):
-    ipython.Completer.disable_matchers.append("copilot_completer")
-
     if settings.inline:
         remove_from_tab_completions(ipython)
     elif settings.auto_suggestion:
         disable_copilot_suggester(ipython)
     elif settings.key_binding:
         remove_key_binding()
-
-
-# Remove the IPython completer warning
-warnings.filterwarnings("ignore", category=ProvisionalCompleterWarning)
 
 
 if get_ipython():

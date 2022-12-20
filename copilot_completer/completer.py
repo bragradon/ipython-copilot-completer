@@ -3,10 +3,13 @@ from __future__ import annotations
 import json
 import time
 from contextlib import suppress
-from typing import TYPE_CHECKING
+from typing import Optional
 
 import requests
+from IPython import get_ipython
 from IPython.core.completer import (
+    Completer,
+    CompletionContext,
     SimpleMatcherResult,
     _convert_matcher_v1_result_to_v2,
     context_matcher,
@@ -15,8 +18,23 @@ from IPython.core.completer import (
 from .settings import settings
 
 
-if TYPE_CHECKING:
-    from IPython.core.completer import Completer, CompletionContext
+def get_copilot_suggestion(text: str) -> Optional[str]:
+    ip = get_ipython()
+    completer = ip.Completer
+    context = CompletionContext(
+        full_text=text,
+        cursor_position=0,
+        cursor_line=0,
+        token=completer.splitter.split_line(text, 0),
+        limit=1,
+    )
+
+    suggestion = copilot_completer(completer, context)
+
+    if completions := suggestion["completions"]:
+        return completions[0].text
+    else:
+        return None
 
 
 @context_matcher()
