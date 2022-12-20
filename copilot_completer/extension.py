@@ -37,6 +37,8 @@ def load_ipython_extension(ipython: InteractiveShell):
         enable_copilot_suggester(ipython)
     elif settings.key_binding:
         add_key_binding()
+    else:
+        print("No Copilot mode enabled")
 
     # Register the magic command
     @magics_class

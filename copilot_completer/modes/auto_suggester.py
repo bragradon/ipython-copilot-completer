@@ -24,7 +24,10 @@ class CopilotSuggester(AutoSuggestFromHistory):
         document: Document,
     ) -> Optional[Suggestion]:
 
+        # Consider only the last line for the suggestion.
         text = document.text.rsplit("\n", 1)[-1]
+
+        # Only create a suggestion when this is not an empty line.
         if (
             text.strip()
             and settings.token
@@ -32,6 +35,7 @@ class CopilotSuggester(AutoSuggestFromHistory):
         ):
             return Suggestion(suggestion)
 
+        # Fallback to history
         return super().get_suggestion(buffer, document)
 
 

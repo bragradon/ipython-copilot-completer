@@ -46,5 +46,4 @@ def get_copilot_completions(event):
     buffer = event.current_buffer
 
     if suggestion := get_copilot_suggestion(buffer.document.text):
-        # buffer.delete_before_cursor(-completions[0].start_position)
         buffer.insert_text(suggestion)
