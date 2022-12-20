@@ -27,10 +27,9 @@ def load_ipython_extension(ipython: InteractiveShell):
     This completer patches the IPython completers to put Copilot at the start
     """
     if not settings.token:
-        print(
-            "GITHUB_COPILOT_ACCESS_TOKEN environment variable is not set - Copilot will not work",
-        )
+        print("You do not have a GitHub Copilot access token setup")
         print("Please run %copilot_login to set your token")
+        print("or set the GITHUB_COPILOT_ACCESS_TOKEN environment variable")
 
     if settings.inline:
         add_to_tab_completions(ipython)
