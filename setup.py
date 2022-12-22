@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import site
 import sys
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 from copilot_completer import __version__
 
@@ -11,14 +14,14 @@ site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 setup(
     name="IPython Copilot Completer",
     version=__version__,
-    description='Use GitHub Copilot in IPython to autocomplete your code',
-    long_description=open('README.md').read(),
-    author='Brandon Navra',
-    author_email='brandon.navra@gmail.com',
+    description="Use GitHub Copilot in IPython to autocomplete your code",
+    long_description=open("README.md").read(),  # noqa: SIM115
+    author="Brandon Navra",
+    author_email="brandon.navra@gmail.com",
     packages=find_packages(),
-    license='MIT',
+    license="MIT",
     install_requires=[
-        'ipython>=8.7.0',
-        'requests',
+        "ipython>=8.7.0",
+        "requests",
     ],
 )
