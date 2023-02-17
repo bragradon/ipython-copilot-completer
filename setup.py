@@ -21,7 +21,7 @@ setup(
     packages=find_packages(),
     license="MIT",
     install_requires=[
-        "ipython>=8.7.0",
+        "ipython>=8.9.0",
         "requests",
     ],
 )

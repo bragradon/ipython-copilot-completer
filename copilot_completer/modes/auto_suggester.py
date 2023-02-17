@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
+from IPython.terminal.shortcuts.auto_suggest import NavigableAutoSuggestFromHistory
 from prompt_toolkit.auto_suggest import (
-    AutoSuggestFromHistory,
     Suggestion,
     ThreadedAutoSuggest,
 )
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from prompt_toolkit.document import Document
 
 
-class CopilotSuggester(AutoSuggestFromHistory):
+class CopilotSuggester(NavigableAutoSuggestFromHistory):
     def get_suggestion(
         self,
         buffer: Buffer,
@@ -41,9 +41,11 @@ class CopilotSuggester(AutoSuggestFromHistory):
 
 def enable_copilot_suggester(ipython):
     if getattr(ipython, "pt_app", None):
+        ipython.autosuggestions_provider = None
         ipython.pt_app.auto_suggest = ThreadedAutoSuggest(CopilotSuggester())
 
 
 def disable_copilot_suggester(ipython):
     # Revert to auto-suggesting from history
-    ipython.autosuggestions_provider = "AutoSuggestFromHistory"
+    if getattr(ipython, "pt_app", None):
+        ipython.autosuggestions_provider = "NavigableAutoSuggestFromHistory"
