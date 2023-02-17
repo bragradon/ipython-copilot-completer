@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING, Optional
 
 from IPython.terminal.shortcuts.auto_suggest import NavigableAutoSuggestFromHistory
@@ -7,6 +8,7 @@ from prompt_toolkit.auto_suggest import (
     Suggestion,
     ThreadedAutoSuggest,
 )
+from requests import RequestException
 
 from ..completer import get_copilot_suggestion
 from ..settings import settings
@@ -28,12 +30,13 @@ class CopilotSuggester(NavigableAutoSuggestFromHistory):
         text = document.text.rsplit("\n", 1)[-1]
 
         # Only create a suggestion when this is not an empty line.
-        if (
-            text.strip()
-            and settings.token
-            and (suggestion := get_copilot_suggestion(text))
-        ):
-            return Suggestion(suggestion)
+        with suppress(RequestException):
+            if (
+                text.strip()
+                and settings.token
+                and (suggestion := get_copilot_suggestion(text))
+            ):
+                return Suggestion(suggestion)
 
         # Fallback to history
         return super().get_suggestion(buffer, document)
