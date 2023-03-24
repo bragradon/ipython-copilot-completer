@@ -3,10 +3,9 @@ from __future__ import annotations
 import json
 import time
 from contextlib import suppress
-from typing import Optional
 
 import requests
-from IPython import get_ipython
+from IPython import get_ipython  # pyright: reportPrivateImportUsage=false
 from IPython.core.completer import (
     Completer,
     CompletionContext,
@@ -18,8 +17,10 @@ from IPython.core.completer import (
 from .settings import settings
 
 
-def get_copilot_suggestion(text: str) -> Optional[str]:
-    ip = get_ipython()
+def get_copilot_suggestion(text: str) -> str | None:
+    if not (ip := get_ipython()):
+        return None
+
     completer = ip.Completer
     context = CompletionContext(
         full_text=text,
@@ -29,7 +30,9 @@ def get_copilot_suggestion(text: str) -> Optional[str]:
         limit=1,
     )
 
-    suggestion = copilot_completer(completer, context)
+    suggestion = copilot_completer(
+        completer, context
+    )  # pyright: reportGeneralTypeIssues=false
 
     if completions := suggestion["completions"]:
         return completions[0].text
@@ -37,7 +40,7 @@ def get_copilot_suggestion(text: str) -> Optional[str]:
         return None
 
 
-@context_matcher()
+@context_matcher()  # pyright: reportGeneralTypeIssues=false
 def copilot_completer(
     self: Completer,
     context: CompletionContext,
@@ -52,7 +55,7 @@ def copilot_completer(
         return SimpleMatcherResult(completions=[])
 
     # Get the current session as a list of lines joined by newlines
-    hm = self.shell.history_manager
+    hm = self.shell.history_manager  # pyright: reportGeneralTypeIssues=false
     session = "\n".join(
         [
             i[-1]
@@ -94,7 +97,7 @@ def copilot_completer(
     return result
 
 
-def get_suggestion(prompt: str, stops: list[str]) -> str:
+def get_suggestion(prompt: str, stops: list[str], suffix: str = "") -> str:
     """
     Get a suggestion from GitHub Copilot
     """
@@ -110,16 +113,23 @@ def get_suggestion(prompt: str, stops: list[str]) -> str:
         else:
             return 0.8
 
+    if suffix:
+        stops += (["def ", "class ", "if ", "\n#"],)
+
+    # TODO: Calculate next indent
+
     payload = json.dumps(
         {
             "prompt": prompt,
+            "suffix": suffix,
             "max_tokens": 200,
             "temperature": get_temperature(prompt.count("\n")),
             "top_p": 1,
             "n": 1,
-            "logprobs": 0,
+            # "logprobs": 0,
             "stop": stops,
             "stream": True,  # The API must be called with stream=True
+            # "feature_flags": ["trim_to_block"],
             "extra": {
                 "language": "python",
                 "next_indent": 0,
