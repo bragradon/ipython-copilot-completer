@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from IPython import get_ipython
-from IPython.terminal.shortcuts import cursor_in_leading_ws
+from IPython import get_ipython  # pyright: reportPrivateImportUsage=false
+from IPython.terminal.shortcuts.filters import cursor_in_leading_ws
 from prompt_toolkit.enums import DEFAULT_BUFFER
 from prompt_toolkit.filters import (
     HasFocus,
@@ -15,7 +15,9 @@ from copilot_completer.completer import get_copilot_suggestion
 
 
 def add_key_binding():
-    ip = get_ipython()
+    if not (ip := get_ipython()):
+        return
+
     if getattr(ip, "pt_app", None):
         insert_mode = vi_insert_mode | emacs_insert_mode
         registry = ip.pt_app.key_bindings
@@ -31,7 +33,9 @@ def add_key_binding():
 
 
 def remove_key_binding():
-    ip = get_ipython()
+    if not (ip := get_ipython()):
+        return
+
     if getattr(ip, "pt_app", None):
         registry = ip.pt_app.key_bindings
         registry.remove(get_copilot_completions)

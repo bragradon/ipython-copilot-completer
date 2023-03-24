@@ -5,7 +5,6 @@ from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from time import sleep
-from typing import Optional
 
 import requests
 from requests import HTTPError, Response
@@ -43,7 +42,7 @@ class AccessToken:
     scope: str
 
 
-def get_github_access_token() -> Optional[AccessToken]:
+def get_github_access_token() -> AccessToken | None:
     print("Initializing a login session with GitHub")
     login_session = get_login_session()
     print(
@@ -77,10 +76,10 @@ def get_login_session() -> LoginSession:
         raise
 
 
-def wait_for_access_token(session: LoginSession) -> Optional[AccessToken]:
+def wait_for_access_token(session: LoginSession) -> AccessToken | None:
     expiry = datetime.now(tz=timezone.utc) + timedelta(seconds=session.expires_in)
     has_expired = False
-    access_token: Optional[AccessToken] = None
+    access_token: AccessToken | None = None
 
     print(f"Polling for login session status until {expiry.isoformat()}")
     while access_token is None and not has_expired:

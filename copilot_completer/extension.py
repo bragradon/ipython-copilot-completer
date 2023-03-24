@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from IPython import get_ipython
+from IPython import get_ipython  # pyright: reportPrivateImportUsage=false
 from IPython.core.magic import Magics, magics_class, register_line_magic
 
 from .github_auth import get_github_access_token
@@ -52,6 +52,7 @@ def load_ipython_extension(ipython: InteractiveShell):
                 print(f"Your GitHub access token is: {token.access_token}")
 
                 ip = get_ipython()
+                assert ip is not None
                 db = ip.db
                 db["github_copilot_access_token"] = token.access_token
                 settings.reset()
@@ -70,4 +71,6 @@ def unload_ipython_extension(ipython: InteractiveShell):
         remove_key_binding()
 
     # Unregister the magic command
-    del ipython.magics_manager.magics["line"]["copilot_login"]
+    del ipython.magics_manager.magics["line"][
+        "copilot_login"
+    ]  # pyright: reportGeneralTypeIssues=false

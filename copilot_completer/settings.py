@@ -4,7 +4,7 @@ import dataclasses
 import os
 from functools import lru_cache
 
-from IPython import get_ipython
+from IPython import get_ipython  # pyright: reportPrivateImportUsage=false
 
 
 DEFAULT = "GITHUB_COPILOT_AUTO_SUGGEST"
@@ -44,6 +44,7 @@ class Settings:
             return env_token
         else:
             ip = get_ipython()
+            assert ip is not None
             db = ip.db
             return db.get("github_copilot_access_token", "")
 
