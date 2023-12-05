@@ -3,7 +3,7 @@ from __future__ import annotations
 import webbrowser
 from contextlib import suppress
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from time import sleep
 
 import requests
@@ -77,7 +77,7 @@ def get_login_session() -> LoginSession:
 
 
 def wait_for_access_token(session: LoginSession) -> AccessToken | None:
-    expiry = datetime.now(tz=timezone.utc) + timedelta(seconds=session.expires_in)
+    expiry = datetime.now(tz=UTC) + timedelta(seconds=session.expires_in)
     has_expired = False
     access_token: AccessToken | None = None
 
@@ -106,7 +106,7 @@ def wait_for_access_token(session: LoginSession) -> AccessToken | None:
             print_failure(response)
             raise
         else:
-            has_expired = datetime.now(tz=timezone.utc) >= expiry
+            has_expired = datetime.now(tz=UTC) >= expiry
 
     return access_token
 

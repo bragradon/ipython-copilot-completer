@@ -2,23 +2,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from IPython import get_ipython  # pyright: reportPrivateImportUsage=false
+from IPython.core.getipython import get_ipython
 from IPython.core.magic import Magics, magics_class, register_line_magic
 
-from .github_auth import get_github_access_token
-from .modes import (
-    add_key_binding,
-    add_to_tab_completions,
+from .auto_suggester import (
     disable_copilot_suggester,
     enable_copilot_suggester,
-    remove_from_tab_completions,
-    remove_key_binding,
 )
+from .github_auth import get_github_access_token
 from .settings import settings
 
 
 if TYPE_CHECKING:
     from IPython.core.interactiveshell import InteractiveShell
+    from IPython.core.magic import MagicsManager
 
 
 def load_ipython_extension(ipython: InteractiveShell):
@@ -31,14 +28,7 @@ def load_ipython_extension(ipython: InteractiveShell):
         print("Please run %copilot_login to set your token")
         print("or set the GITHUB_COPILOT_ACCESS_TOKEN environment variable")
 
-    if settings.inline:
-        add_to_tab_completions(ipython)
-    elif settings.auto_suggestion:
-        enable_copilot_suggester(ipython)
-    elif settings.key_binding:
-        add_key_binding()
-    else:
-        print("No Copilot mode enabled")
+    enable_copilot_suggester(ipython)
 
     # Register the magic command
     @magics_class
@@ -63,14 +53,11 @@ def load_ipython_extension(ipython: InteractiveShell):
 
 
 def unload_ipython_extension(ipython: InteractiveShell):
-    if settings.inline:
-        remove_from_tab_completions(ipython)
-    elif settings.auto_suggestion:
-        disable_copilot_suggester(ipython)
-    elif settings.key_binding:
-        remove_key_binding()
+    disable_copilot_suggester(ipython)
 
     # Unregister the magic command
-    del ipython.magics_manager.magics["line"][
-        "copilot_login"
-    ]  # pyright: reportGeneralTypeIssues=false
+    if ipython.magics_manager:
+        if TYPE_CHECKING:
+            assert isinstance(ipython.magics_manager, MagicsManager)
+            assert isinstance(ipython.magics_manager.magics, dict)
+        del ipython.magics_manager.magics["line"]["copilot_login"]

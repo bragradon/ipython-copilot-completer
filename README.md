@@ -29,32 +29,6 @@ This will open a browser window where you can log in to GitHub and generate a to
 
 Alternatively, if you already have a token, you can set it via the `GITHUB_COPILOT_ACCESS_TOKEN` environment variable.
 
-## Operation modes
-
-IPython Copilot Completer can operate in 3 modes: 'autosuggestion, 'keybinding', and 'inline'.
-The default is 'autosuggestion'.
-
-### Auto suggestions
-
-You can configure IPython Copilot Completer to provide Copilot completions as inline auto-suggestions.
-To do so, set the `GITHUB_COPILOT_AUTO_SUGGEST` environment variable to `1`.
-
-### Keyboard shortcut
-
-You can configure IPython Copilot Completer to provide Copilot completions only after hitting `ctrl-space` to trigger the completion.
-The completions provided will replace the current line and can be accepted by pressing enter.
-To do so, set the `GITHUB_COPILOT_KEY_BINDING` environment variable to `1`.
-
-### Inlining Copilot completions
-
-You can configure IPython Copilot Completer to have the Copilot completions inline with other completions.
-They will appear inside the tab completion menu.
-To do so, set the `GITHUB_COPILOT_INLINE_COMPLETIONS` environment variable to `1`.
-
-Note: This will slow down tab completion as it will require an additional API call to GitHub Copilot for each completion.
-It also returns only a single completion, so it is not as useful as the default behavior.
-
-
 ## License
 
 IPython Copilot Completer is released under the [MIT License](LICENSE).
