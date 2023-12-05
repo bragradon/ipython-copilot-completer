@@ -4,22 +4,26 @@ import asyncio
 from typing import TYPE_CHECKING
 
 from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
+from typing_extensions import override
 
 from .completer import fetch_copilot_suggestion
 from .settings import settings
 
 
 if TYPE_CHECKING:
+    from IPython.terminal.interactiveshell import TerminalInteractiveShell
     from prompt_toolkit.buffer import Buffer
     from prompt_toolkit.document import Document
 
 
 class AsyncCopilotSuggest(AutoSuggest):
     def __init__(self):
+        super().__init__()
         self.loop = asyncio.get_event_loop()
         self.last_text = ""
         self.debounce_time = 0.5  # 500 milliseconds
 
+    @override
     def get_suggestion(
         self,
         buffer: Buffer,
@@ -31,7 +35,7 @@ class AsyncCopilotSuggest(AutoSuggest):
         # Only proceed if text has changed and is not empty
         if text != self.last_text and text and settings.token:
             self.last_text = text
-            asyncio.ensure_future(self.debounce_fetch(buffer, text))  # noqa: RUF006
+            _ = asyncio.ensure_future(self.debounce_fetch(buffer, text))
 
         return None
 
@@ -44,13 +48,13 @@ class AsyncCopilotSuggest(AutoSuggest):
                 buffer.on_suggestion_set.fire()
 
 
-def enable_copilot_suggester(ipython):
-    if getattr(ipython, "pt_app", None):
+def enable_copilot_suggester(ipython: TerminalInteractiveShell):
+    if getattr(ipython, "pt_app", None) and ipython.pt_app:
         ipython.autosuggestions_provider = None
         ipython.pt_app.auto_suggest = AsyncCopilotSuggest()
 
 
-def disable_copilot_suggester(ipython):
+def disable_copilot_suggester(ipython: TerminalInteractiveShell):
     # Revert to auto-suggesting from history
     if getattr(ipython, "pt_app", None):
         ipython.autosuggestions_provider = "NavigableAutoSuggestFromHistory"

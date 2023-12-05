@@ -3,7 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from IPython.core.getipython import get_ipython
-from IPython.core.magic import Magics, magics_class, register_line_magic
+from IPython.core.magic import (
+    Magics,
+    magics_class,  # type: ignore[import]
+    register_line_magic,  # type: ignore[import]
+)
 
 from .auto_suggester import (
     disable_copilot_suggester,
@@ -14,11 +18,11 @@ from .settings import settings
 
 
 if TYPE_CHECKING:
-    from IPython.core.interactiveshell import InteractiveShell
     from IPython.core.magic import MagicsManager
+    from IPython.terminal.interactiveshell import TerminalInteractiveShell
 
 
-def load_ipython_extension(ipython: InteractiveShell):
+def load_ipython_extension(ipython: TerminalInteractiveShell):
     """
     Add a custom completer to IPython that uses GitHub Copilot
     This completer patches the IPython completers to put Copilot at the start
@@ -34,7 +38,7 @@ def load_ipython_extension(ipython: InteractiveShell):
     @magics_class
     class CopilotMagics(Magics):
         @register_line_magic
-        def copilot_login(self, line=None):
+        def copilot_login(self, line: str | None = None):  # noqa: ARG002
             """
             Get a GitHub access token for Copilot
             """
@@ -52,7 +56,7 @@ def load_ipython_extension(ipython: InteractiveShell):
     ipython.register_magics(CopilotMagics)
 
 
-def unload_ipython_extension(ipython: InteractiveShell):
+def unload_ipython_extension(ipython: TerminalInteractiveShell):
     disable_copilot_suggester(ipython)
 
     # Unregister the magic command

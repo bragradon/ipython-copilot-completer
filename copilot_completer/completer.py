@@ -39,7 +39,7 @@ async def fetch_copilot_suggestion(text: str) -> str | None:
 
     suggestion = await copilot_completer(completer, context)
 
-    if completions := suggestion["completions"]:
+    if completions := cast(list[SimpleCompletion], suggestion["completions"]):
         return completions[0].text
     else:
         return None
@@ -149,7 +149,7 @@ async def fetch_suggestion(prompt: str, stops: list[str], suffix: str = "") -> s
         "Content-Type": "application/json",
     }
 
-    lines = []
+    lines: list[str] = []
 
     async with aiohttp.ClientSession() as session:  # noqa: SIM117
         async with session.post(
@@ -161,7 +161,7 @@ async def fetch_suggestion(prompt: str, stops: list[str], suffix: str = "") -> s
                 if line:
                     line = line.decode("utf-8")[6:]  # Remove the data: prefix
                     with suppress(json.JSONDecodeError):
-                        lines.append(json.loads(line)["choices"][0]["text"])
+                        lines.append(str(json.loads(line)["choices"][0]["text"]))
 
     return "".join(lines)
 

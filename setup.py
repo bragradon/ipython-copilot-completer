@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import site
 import sys
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
@@ -13,7 +14,7 @@ setup(
     name="IPython Copilot Completer",
     version="0.0.8",
     description="Use GitHub Copilot in IPython to autocomplete your code",
-    long_description=open("README.md").read(),
+    long_description=Path("README.md").open().read(),
     author="Brandon Navra",
     author_email="brandon.navra@gmail.com",
     packages=find_packages(),
@@ -21,5 +22,7 @@ setup(
     install_requires=[
         "IPython>=8.18.0",
         "aiohttp>=3.9.1",
+        " pickleshare>=0.7.5",
+        "requests>=2.26.0",
     ],
 )

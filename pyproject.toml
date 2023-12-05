@@ -1,39 +1,36 @@
 [tool.ruff]
 extend-select = [
-  #    "A",   # flake8-builtins
-  #    # "ANN", # flake8-annotations
-  #    "ARG", # flake8-unused-arguments
-  #    "B",   # flake8-bugbear
-  #    "BLE", # flake8-blind-except
-  #    "C4",  # flake8-comprehensions
+  "A",   # flake8-builtins
+  "ARG", # flake8-unused-arguments
+  "B",   # flake8-bugbear
+  "BLE", # flake8-blind-except
+  "C4",  # flake8-comprehensions
   "C90", # mccabe
-  #    "DJ",  # flake8-django
-  #    "DTZ", # flake8-datetimez
-  "E", # pycodestyle
-  #    "ERA", # flake8-eradicate
-  "F", # pyflakes
-  #    "FBT", # flake8-boolean-trap
+  "DTZ", # flake8-datetimez
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "FBT", # flake8-boolean-trap
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
   "ICN", # flake8-import-conventions
-  #    "N",   # pep8-naming
-  #    "PGH", # pygrep-hooks
-  #    "PIE", # flake8-pie
-  #    "PLC", # pylint
-  #    "PLE", # pylint
-  #    "PLR", # pylint
-  #    "PLW", # pylint
-  #    "PT",  # flake8-pytest
-  #    "PTH", # flake8-use-pathlib
-  #    "RET", # flake8-return
-  #    "RSE", # flake8-raise
+  "N",   # pep8-naming
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PLC", # pylint
+  "PLE", # pylint
+  # "PLR", # pylint
+  # "PLW", # pylint
+  "PT",  # flake8-pytest
+  "PTH", # flake8-use-pathlib
+  # "RET", # flake8-return
+  "RSE", # flake8-raise
   "RUF", # ruff
   "SIM", # flake8-simplify
   "T10", # flake8-debugger
-  #    "T20", # flake8-print
-  #    "TRY", # tryceratops
-  "UP", # pyupgrade
-  "W",  # pycodestyle
+  #"T20", # flake8-print
+  "TRY", # tryceratops
+  "UP",  # pyupgrade
+  "W",   # pycodestyle
 ]
 extend-exclude = [".venv"]
 output-format = "grouped"
@@ -56,7 +53,7 @@ target-version = "py311"
 combine-as-imports = true
 lines-after-imports = 2
 known-first-party = ["copilot_completer"]
-known-third-party = ["IPython", "aiohttp", "requests"]
+known-third-party = ["IPython", "aiohttp", "requests", "pickleshare"]
 known-local-folder = ["copilot_completer"]
 required-imports = ["from __future__ import annotations"]
 
@@ -74,16 +71,16 @@ skip-magic-trailing-comma = false
 all = true
 
 [tool.pyright]
-pythonVersion = "3.12"
+pythonVersion = "3.11"
 pythonPlatform = "All"
-typeCheckingMode = "basic"
+typeCheckingMode = "strict"
 venvPath = "."
 venv = ".venv"
 
 include = ["*.py"]
 exclude = ["**/__pycache__"]
-ignore = ["**/__pycache__"]
-strict = []
+ignore = ["**/__pycache__", "**/.venv"]
+strict = ["*.py"]
 
 useLibraryCodeForTypes = true
 enableExperimentalFeatures = true
@@ -132,46 +129,46 @@ reportUnusedCoroutine = "error"
 reportConstantRedefinition = "error"
 reportDeprecated = "error"
 reportDuplicateImport = "error"
-reportFunctionMemberAccess = "none"
-reportIncompatibleMethodOverride = "none"
-reportIncompatibleVariableOverride = "none"
-reportIncompleteStub = "none"
-reportInconsistentConstructor = "none"
+reportFunctionMemberAccess = "error"
+reportIncompatibleMethodOverride = "error"
+reportIncompatibleVariableOverride = "error"
+reportIncompleteStub = "error"
+reportInconsistentConstructor = "error"
 reportInvalidStubStatement = "error"
 reportMatchNotExhaustive = "error"
-reportMissingParameterType = "none"
-reportMissingTypeArgument = "none"
+reportMissingParameterType = "error"
+reportMissingTypeArgument = "error"
 reportOverlappingOverload = "error"
-reportPrivateUsage = "none"
-reportTypeCommentUsage = "none"
-reportUnknownArgumentType = "none"
-reportUnknownLambdaType = "none"
-reportUnknownMemberType = "none"
-reportUnknownParameterType = "none"
-reportUnknownVariableType = "none"
+reportPrivateUsage = "error"
+reportTypeCommentUsage = "error"
+reportUnknownArgumentType = "error"
+reportUnknownLambdaType = "error"
+reportUnknownMemberType = "none"             # Too aggressive for now
+reportUnknownParameterType = "error"
+reportUnknownVariableType = "error"
 reportUnnecessaryCast = "error"
-reportUnnecessaryComparison = "none"
+reportUnnecessaryComparison = "error"
 reportUnnecessaryContains = "error"
-reportUnnecessaryIsInstance = "none"
+reportUnnecessaryIsInstance = "error"
 reportUnusedClass = "error"
-reportUnusedImport = "none"
-reportUnusedFunction = "none"
-reportUnusedVariable = "none"
+reportUnusedImport = "error"
+reportUnusedFunction = "error"
+reportUnusedVariable = "error"
 reportUntypedBaseClass = "error"
 reportUntypedClassDecorator = "error"
-reportUntypedFunctionDecorator = "none"
+reportUntypedFunctionDecorator = "error"
 reportUntypedNamedTuple = "error"
 
 # Settings which are always false unless overridden
 # These are usually code style issues and
 # we don't want to be forced to fix them unless we want to
-reportCallInDefaultInitializer = "none"
-reportImplicitOverride = "none"
-reportImplicitStringConcatenation = "none"
-reportImportCycles = "none"
-reportMissingSuperCall = "none"
+reportCallInDefaultInitializer = "error"
+reportImplicitOverride = "error"
+reportImplicitStringConcatenation = "error"
+reportImportCycles = "error"
+reportMissingSuperCall = "error"
 reportPropertyTypeMismatch = "error"
 reportShadowedImports = "error"
-reportUninitializedInstanceVariable = "none"
+reportUninitializedInstanceVariable = "error"
 reportUnnecessaryTypeIgnoreComment = "error"
-reportUnusedCallResult = "none"
+reportUnusedCallResult = "error"

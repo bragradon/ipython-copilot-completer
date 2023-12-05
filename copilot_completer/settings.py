@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import os
 from functools import lru_cache
+from typing import TYPE_CHECKING
 
 from IPython.core.getipython import get_ipython
 
@@ -24,13 +25,17 @@ class Settings:
         )
 
     @staticmethod
-    def get_token():
+    def get_token() -> str:
         if env_token := os.environ.get("GITHUB_COPILOT_ACCESS_TOKEN", ""):
             return env_token
         else:
             ip = get_ipython()
             assert ip is not None
             db = ip.db
+
+            if TYPE_CHECKING:
+                return "String"
+
             return db.get("github_copilot_access_token", "")
 
 

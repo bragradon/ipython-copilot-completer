@@ -51,7 +51,7 @@ def get_github_access_token() -> AccessToken | None:
     print(f"\t{login_session.user_code}")
 
     with suppress(Exception):
-        webbrowser.open(login_session.verification_uri)
+        _ = webbrowser.open(login_session.verification_uri)
 
     if access_token := wait_for_access_token(login_session):
         return access_token
