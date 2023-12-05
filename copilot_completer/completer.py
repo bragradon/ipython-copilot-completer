@@ -2,22 +2,29 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Callable
 from contextlib import suppress
+from typing import TYPE_CHECKING, Any, ParamSpec, cast
 
+import aiohttp
 import requests
-from IPython import get_ipython  # pyright: reportPrivateImportUsage=false
 from IPython.core.completer import (
-    Completer,
     CompletionContext,
+    IPCompleter,
+    SimpleCompletion,
     SimpleMatcherResult,
-    _convert_matcher_v1_result_to_v2,
-    context_matcher,
 )
+from IPython.core.getipython import get_ipython
 
 from .settings import settings
 
 
-def get_copilot_suggestion(text: str) -> str | None:
+if TYPE_CHECKING:
+    from IPython.core.history import HistoryManager
+    from IPython.core.interactiveshell import InteractiveShell
+
+
+async def fetch_copilot_suggestion(text: str) -> str | None:
     if not (ip := get_ipython()):
         return None
 
@@ -30,9 +37,7 @@ def get_copilot_suggestion(text: str) -> str | None:
         limit=1,
     )
 
-    suggestion = copilot_completer(
-        completer, context
-    )  # pyright: reportGeneralTypeIssues=false
+    suggestion = await copilot_completer(completer, context)
 
     if completions := suggestion["completions"]:
         return completions[0].text
@@ -40,9 +45,8 @@ def get_copilot_suggestion(text: str) -> str | None:
         return None
 
 
-@context_matcher()  # pyright: reportGeneralTypeIssues=false
-def copilot_completer(
-    self: Completer,
+async def copilot_completer(
+    completer: IPCompleter,
     context: CompletionContext,
 ) -> SimpleMatcherResult:
     """
@@ -55,11 +59,18 @@ def copilot_completer(
         return SimpleMatcherResult(completions=[])
 
     # Get the current session as a list of lines joined by newlines
-    hm = self.shell.history_manager  # pyright: reportGeneralTypeIssues=false
+    if TYPE_CHECKING:
+        assert isinstance(completer.shell, InteractiveShell)
+        hm = cast(HistoryManager, completer.shell.history_manager)
+    else:
+        hm = completer.shell.history_manager
+
+    session_number = cast(int, hm.session_number)
+
     session = "\n".join(
         [
             i[-1]
-            for i in hm.get_range(hm.session_number)
+            for i in cast(list[str], hm.get_range(session_number))
             if not i[-1].startswith(("%", "!"))
         ],
     )
@@ -79,30 +90,24 @@ def copilot_completer(
 
     # Get the suggestion from Copilot
     # If the current line starts with # then we allow the suggestion to be a comment
-    code = get_suggestion(prompt, stops=["\n\n" if is_comment else "\n"])
+    code = await fetch_suggestion(prompt, stops=["\n\n" if is_comment else "\n"])
 
     # If the line is a comment then we need to add a newline as the suggestion
     # appears after the comment on a new line
     text = f"{context.token}\n" if is_comment else context.token
 
     # Return the suggestion
-    result: dict = _convert_matcher_v1_result_to_v2(
-        matches=[text + code],
-        type="copilot",
-        suppress_if_matches=False,
+    return SimpleMatcherResult(
+        completions=[SimpleCompletion(text=text + code, type="copilot")]
     )
-    result |= {
-        "ordered": True,  # Place Copilot suggestions at the top (though below jedi)
-    }
-    return result
 
 
-def get_suggestion(prompt: str, stops: list[str], suffix: str = "") -> str:
+async def fetch_suggestion(prompt: str, stops: list[str], suffix: str = "") -> str:
     """
-    Get a suggestion from GitHub Copilot
+    Get a suggestion from GitHub Copilot asynchronously using aiohttp.
     """
 
-    def get_temperature(line_count):
+    def get_temperature(line_count: int) -> float:
         line_count = max(1, line_count - 2)
         if line_count <= 1:
             return 0
@@ -114,7 +119,7 @@ def get_suggestion(prompt: str, stops: list[str], suffix: str = "") -> str:
             return 0.8
 
     if suffix:
-        stops += (["def ", "class ", "if ", "\n#"],)
+        stops += ["def ", "class ", "if ", "\n#"]
 
     # TODO: Calculate next indent
 
@@ -146,35 +151,34 @@ def get_suggestion(prompt: str, stops: list[str], suffix: str = "") -> str:
 
     lines = []
 
-    with requests.post(
-        "https://copilot-proxy.githubusercontent.com/v1/engines/copilot-codex/completions",
-        data=payload,
-        headers=headers,
-        stream=True,
-    ) as resp:
-        # The API returns a stream of JSON-like objects or blank lines
-        # We need to parse the JSON-like objects and ignore the blank lines
-        # The format of the JSON-like objects is:
-        # data: {"choices": [{"text": "suggestion"}]}}
-
-        for line in resp.iter_lines():
-            if line:
-                line = line.decode("utf-8")[6:]  # Remove the data: prefix
-                with suppress(json.JSONDecodeError):
-                    lines.append(json.loads(line)["choices"][0]["text"])
+    async with aiohttp.ClientSession() as session:  # noqa: SIM117
+        async with session.post(
+            "https://copilot-proxy.githubusercontent.com/v1/engines/copilot-codex/completions",
+            data=payload,
+            headers=headers,
+        ) as resp:
+            async for line in resp.content:
+                if line:
+                    line = line.decode("utf-8")[6:]  # Remove the data: prefix
+                    with suppress(json.JSONDecodeError):
+                        lines.append(json.loads(line)["choices"][0]["text"])
 
     return "".join(lines)
 
 
-def memoize_with_expiry(func):
+P = ParamSpec("P")
+R = tuple[str, float]
+
+
+def memoize_with_expiry(func: Callable[P, R]) -> Callable[..., str]:
     """
     Function to memoize the return value of a function call
     The function func must return a tuple of value and expiry time
     The expiry time is used to determine when to expire the cache
     """
-    cache = {}
+    cache: dict[Any, R] = {}
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> str:
         key = (args, tuple(kwargs.items()))
         if key in cache:
             value, expiry = cache[key]
@@ -188,7 +192,7 @@ def memoize_with_expiry(func):
 
 
 @memoize_with_expiry
-def get_copilot_token() -> tuple[str, str]:
+def get_copilot_token() -> R:
     """
     Get the Copilot token from the GitHub API
     """

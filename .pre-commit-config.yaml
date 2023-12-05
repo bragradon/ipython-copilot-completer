@@ -49,4 +49,4 @@ repos:
     rev: v1.1.338
     hooks:
       - id: pyright
-        additional_dependencies: [ipython, requests]
+        additional_dependencies: [ipython, aiohttp, requests]

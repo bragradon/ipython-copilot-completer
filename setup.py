@@ -20,6 +20,6 @@ setup(
     license="MIT",
     install_requires=[
         "IPython>=8.18.0",
-        "requests",
+        "aiohttp>=3.9.1",
     ],
 )

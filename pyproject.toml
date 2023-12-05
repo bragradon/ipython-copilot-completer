@@ -56,7 +56,7 @@ target-version = "py311"
 combine-as-imports = true
 lines-after-imports = 2
 known-first-party = ["copilot_completer"]
-known-third-party = ["IPython", "requests"]
+known-third-party = ["IPython", "aiohttp", "requests"]
 known-local-folder = ["copilot_completer"]
 required-imports = ["from __future__ import annotations"]
 
