@@ -5,7 +5,7 @@ import sys
 
 from setuptools import find_packages, setup
 
-from copilot_completer import __version__
+from __version__ import __version__
 
 
 # Allow editable install into user site directory.
@@ -21,7 +21,7 @@ setup(
     packages=find_packages(),
     license="MIT",
     install_requires=[
-        "ipython>=8.9.0",
+        "IPython>=8.9.0",
         "requests",
     ],
 )
