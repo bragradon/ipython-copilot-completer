@@ -19,7 +19,11 @@ if TYPE_CHECKING:
 class AsyncCopilotSuggest(AutoSuggest):
     def __init__(self):
         super().__init__()
-        self.loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+        self.loop = loop
         self.last_text = ""
         self.debounce_time = 0.5  # 500 milliseconds
 
