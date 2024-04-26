@@ -7,6 +7,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any, ParamSpec, cast
 
 import aiohttp
+from prompt_toolkit.buffer import Buffer
 import requests
 from IPython.core.completer import (
     CompletionContext,
@@ -24,13 +25,18 @@ if TYPE_CHECKING:
     from IPython.core.interactiveshell import InteractiveShell
 
 
-async def fetch_copilot_suggestion(text: str) -> str | None:
+async def fetch_copilot_suggestion(buffer:Buffer) -> str | None:
     if not (ip := get_ipython()):
         return None
-
     completer = ip.Completer
+
+    # use past history as context for prompt
+    history_text = buffer.history.get_strings()[-8:]
+    text='\n'.join(history_text)[-512:]
+    full_text= text+'\n'+buffer.text
+
     context = CompletionContext(
-        full_text=text,
+        full_text=full_text,
         cursor_position=0,
         cursor_line=0,
         token=completer.splitter.split_line(text, 0),
@@ -90,7 +96,7 @@ async def copilot_completer(
 
     # Get the suggestion from Copilot
     # If the current line starts with # then we allow the suggestion to be a comment
-    code = await fetch_suggestion(prompt, stops=["\n\n" if is_comment else "\n"])
+    code = await fetch_suggestion(prompt, stops=["\n\n"])# if is_comment else "\n"])
 
     # If the line is a comment then we need to add a newline as the suggestion
     # appears after the comment on a new line
@@ -117,9 +123,6 @@ async def fetch_suggestion(prompt: str, stops: list[str], suffix: str = "") -> s
             return 0.4
         else:
             return 0.8
-
-    if suffix:
-        stops += ["def ", "class ", "if ", "\n#"]
 
     # TODO: Calculate next indent
 

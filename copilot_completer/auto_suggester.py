@@ -46,7 +46,7 @@ class AsyncCopilotSuggest(AutoSuggest):
     async def debounce_fetch(self, buffer: Buffer, text: str):
         await asyncio.sleep(self.debounce_time)
         if text == self.last_text:  # Check if text is unchanged
-            suggestion = await fetch_copilot_suggestion(text)
+            suggestion = await fetch_copilot_suggestion(buffer)
             if suggestion:
                 buffer.suggestion = Suggestion(suggestion)
                 buffer.on_suggestion_set.fire()
