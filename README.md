@@ -6,7 +6,7 @@ IPython Copilot Completer is a plugin for the IPython interactive shell that pro
 
 ```bash
 # Method 1: wheel
-V="0.0.9"
+V="0.0.10"
 wget https://github.com/bragradon/ipython-copilot-completer/releases/download/v$V/IPython_Copilot_Completer-$V-py3-none-any.whl
 pip install IPython_Copilot_Completer-$V-py3-none-any.whl
 

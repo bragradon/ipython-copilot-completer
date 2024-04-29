@@ -12,7 +12,7 @@ site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 setup(
     name="IPython Copilot Completer",
-    version="0.0.9",
+    version="0.0.10",
     description="Use GitHub Copilot in IPython to autocomplete your code",
     long_description=Path("README.md").open().read(),
     author="Brandon Navra",
