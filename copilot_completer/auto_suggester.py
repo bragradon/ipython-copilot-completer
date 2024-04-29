@@ -37,7 +37,7 @@ class AsyncCopilotSuggest(AutoSuggest):
         text = document.text.rsplit("\n", 1)[-1].strip()
 
         # Only proceed if text has changed and is not empty
-        if text != self.last_text and text and settings.token:
+        if settings.token:
             self.last_text = text
             _ = asyncio.ensure_future(self.debounce_fetch(buffer, text))
 
@@ -46,7 +46,7 @@ class AsyncCopilotSuggest(AutoSuggest):
     async def debounce_fetch(self, buffer: Buffer, text: str):
         await asyncio.sleep(self.debounce_time)
         if text == self.last_text:  # Check if text is unchanged
-            suggestion = await fetch_copilot_suggestion(text)
+            suggestion = await fetch_copilot_suggestion(buffer)
             if suggestion:
                 buffer.suggestion = Suggestion(suggestion)
                 buffer.on_suggestion_set.fire()
